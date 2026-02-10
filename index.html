@@ -1,25 +1,43 @@
 <!DOCTYPE html>
-<html>
+<html lang="he">
 <head>
   <meta charset="UTF-8">
-  <title>Links</title>
+  <title>ClearPass Links</title>
+
+  <!-- Favicons -->
   <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16x16.png">
   <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
   <style>
     body {
       font-family: Arial, sans-serif;
       background: #f5f7fa;
+      margin: 0;
+      padding: 40px 16px;
       display: flex;
       justify-content: center;
-      padding-top: 60px;
     }
-    .container {
-      width: 320px;
-    }
-    h1 {
+
+    .page {
+      width: 100%;
+      max-width: 360px;
       text-align: center;
     }
+
+    .logo {
+      max-width: 180px;
+      width: 100%;
+      margin: 0 auto 24px;
+      display: block;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+    }
+
     a.button {
       display: block;
       text-decoration: none;
@@ -27,25 +45,24 @@
       color: white;
       padding: 14px;
       margin: 12px 0;
-      text-align: center;
       border-radius: 8px;
       font-weight: bold;
     }
+
     a.button:hover {
       background: #1d4ed8;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <img src="assets/ClearPassLogo.png" alt="ClearPass" class="logo">
-  </div>
-  <br/>
-  <div class="container">
-    <h1>לאן תרצו להגיע?</h1>
 
-    <a class="button" href="asa_tennis/payment.html">עמוד התשלום של אסא טניס ירושלים</a>
+  <div class="page">
+    <img src="/assets/ClearPassLogo.png" alt="ClearPass" class="logo">
 
+    <h1>ClearPass</h1>
+
+    <a class="button" href="asa_tennis/payment.html">אסא טניס ירושלים</a>
   </div>
+
 </body>
 </html>
