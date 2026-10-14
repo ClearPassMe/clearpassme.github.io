@@ -229,7 +229,6 @@
       display: flex;
       justify-content: center;
       gap: 8px;
-      margin-top: 14px;
     }
     .dots button {
       width: 8px;
@@ -242,6 +241,154 @@
       transition: background-color .2s, width .2s;
     }
     .dots button[aria-current="true"] { background: var(--ink); width: 22px; border-radius: 4px; }
+
+    /* while playing, the active dot fills up over the slide's duration, so people can see when the next photo comes */
+    .gallery-controls.is-playing .dots button[aria-current="true"] {
+      position: relative;
+      overflow: hidden;
+      width: 28px;
+      background: rgba(50, 51, 106, .28);
+    }
+    .gallery-controls.is-playing .dots button[aria-current="true"]::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: var(--ink);
+      border-radius: inherit;
+      transform-origin: left center;
+      animation: dot-fill var(--slide-delay, 5000ms) linear forwards;
+    }
+    [dir="rtl"] .gallery-controls.is-playing .dots button[aria-current="true"]::after { transform-origin: right center; }
+    @keyframes dot-fill {
+      from { transform: scaleX(0); }
+      to   { transform: scaleX(1); }
+    }
+
+    /* play/pause sits next to the dots; the photos advance slowly and stop as soon as someone touches them */
+    .gallery-controls {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      margin-top: 12px;
+    }
+    .autoplay-toggle {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 34px;
+      height: 34px;
+      padding: 0;
+      border: 1.5px solid var(--ink);
+      border-radius: 50%;
+      background: transparent;
+      color: var(--ink);
+      cursor: pointer;
+    }
+    .autoplay-toggle:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
+    .autoplay-toggle svg { width: 14px; height: 14px; fill: currentColor; }
+    .autoplay-toggle .icon-play { display: none; }
+    .autoplay-toggle.is-paused .icon-play { display: block; }
+    .autoplay-toggle.is-paused .icon-pause { display: none; }
+
+    /* the diary page opens full screen; a small magnifier badge says it can be tapped */
+    .diary-open {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+      padding: 0;
+      border: 0;
+      background: none;
+      cursor: zoom-in;
+      border-radius: 6px;
+    }
+    .diary-open:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+    .diary-open::after {
+      content: "";
+      position: absolute;
+      bottom: 6px;
+      inset-inline-end: 6px;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: var(--ink) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2.4' stroke-linecap='round'%3E%3Ccircle cx='10.5' cy='10.5' r='6'/%3E%3Cpath d='M15 15l5 5M10.5 8v5M8 10.5h5'/%3E%3C/svg%3E") center / 17px no-repeat;
+      box-shadow: 0 2px 8px rgba(30, 30, 60, .3);
+    }
+
+    html.lightbox-open { overflow: hidden; }
+
+    .lightbox {
+      width: 100vw;
+      height: 100vh;
+      height: 100dvh;
+      max-width: none;
+      max-height: none;
+      margin: 0;
+      padding: 0;
+      border: 0;
+      background: rgba(22, 22, 44, .95);
+      color: #fff;
+    }
+    .lightbox::backdrop { background: rgba(22, 22, 44, .95); }
+    .lightbox[open] { display: flex; flex-direction: column; }
+
+    .lightbox-stage {
+      flex: 1;
+      min-height: 0;
+      overflow: auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 64px 16px 8px;
+    }
+    .lightbox-stage img {
+      max-width: 100%;
+      max-height: 100%;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+      cursor: zoom-in;
+    }
+    /* zoomed: the page is shown larger and the stage scrolls, so the handwriting can be read */
+    .lightbox.is-zoomed .lightbox-stage { display: block; }
+    .lightbox.is-zoomed .lightbox-stage img {
+      max-width: none;
+      max-height: none;
+      width: min(1086px, 200%);
+      margin: 0 auto;
+      cursor: zoom-out;
+    }
+
+    .lightbox-close {
+      position: absolute;
+      top: 14px;
+      inset-inline-end: 14px;
+      z-index: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      height: 44px;
+      padding: 0;
+      border: 1.5px solid rgba(255, 255, 255, .7);
+      border-radius: 50%;
+      background: rgba(22, 22, 44, .6);
+      color: #fff;
+      cursor: pointer;
+    }
+    .lightbox-close svg { width: 20px; height: 20px; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; fill: none; }
+    .lightbox-close:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
+
+    .lightbox-hint {
+      margin: 0;
+      padding: 10px 16px 18px;
+      text-align: center;
+      font-size: .92rem;
+      opacity: .8;
+    }
 
     /* ---------- Desktop: text on the right, photos + Next October on the left ---------- */
     @media (min-width: 900px) {
@@ -293,8 +440,10 @@
         overflow: visible;
       }
       .gallery .diary img { width: 100%; height: auto; }
+      .diary-open { height: auto; }
+      .diary-open::after { width: 26px; height: 26px; background-size: 15px; bottom: 4px; inset-inline-end: 4px; }
 
-      .dots { display: none; }
+      .gallery-controls { display: none; }
 
       /* tighter type so the memorial line fits without making the page scroll */
       .hero { padding-bottom: 8px; }
@@ -358,14 +507,6 @@
     .btn-secondary { background: transparent; color: var(--ink); border: 2px solid var(--ink); }
     .btn-secondary:hover { background: var(--ink); color: #fff; }
 
-    .btn-sm {
-      min-height: 36px;
-      padding: 6px 16px;
-      font-size: .92rem;
-      border-width: 1.5px;
-      white-space: nowrap;
-    }
-
     @media (prefers-reduced-motion: reduce) {
       html { scroll-behavior: auto; }
       .btn, .dots button { transition: none; }
@@ -381,7 +522,6 @@
       <a href="https://clearpass.me" aria-label="ClearPass - חזרה לאתר">
         <img src="assets/logo-clearpass.png" alt="ClearPass" width="1020" height="220">
       </a>
-      <a class="btn btn-secondary btn-sm" href="https://clearpass.me">→ חזרה לאתר</a>
     </div>
     <div class="header-end">
       <nav class="lang-switch" aria-label="בחירת שפה">
@@ -432,7 +572,9 @@
       <div class="media">
         <div class="gallery" id="gallery" aria-label="תמונות של יוחאי">
           <figure class="diary">
-            <img src="assets/diary.png" alt="דף בכתב ידו של יוחאי מתוך היומן" width="543" height="724">
+            <button class="diary-open" type="button" aria-haspopup="dialog" aria-controls="diary-lightbox" aria-label="פתיחת דף היומן במסך מלא">
+              <img src="assets/diary.png" alt="דף בכתב ידו של יוחאי מתוך היומן" width="543" height="724">
+            </button>
           </figure>
           <figure class="ph-snow">
             <img src="assets/snow.jpg" alt="יוחאי בשלג, במעיל אדום" width="1628" height="2182" loading="lazy">
@@ -450,7 +592,13 @@
             <img src="assets/outdoors.jpg" alt="יוחאי עם משקפי שמש, נשען לאחור בשקיעה" width="2264" height="4032" loading="lazy">
           </figure>
         </div>
-        <div class="dots" id="dots" aria-label="מעבר בין התמונות"></div>
+        <div class="gallery-controls">
+          <button class="autoplay-toggle" id="autoplay" type="button" aria-controls="gallery" aria-label="עצירת התמונות">
+            <svg class="icon-pause" viewBox="0 0 14 14" aria-hidden="true"><rect x="2" y="1" width="3.5" height="12" rx="1"/><rect x="8.5" y="1" width="3.5" height="12" rx="1"/></svg>
+            <svg class="icon-play" viewBox="0 0 14 14" aria-hidden="true"><path d="M3 1.5v11a.8.8 0 0 0 1.2.7l9-5.5a.8.8 0 0 0 0-1.4l-9-5.5A.8.8 0 0 0 3 1.5z"/></svg>
+          </button>
+          <div class="dots" id="dots" aria-label="מעבר בין התמונות"></div>
+        </div>
       </div>
 
       <article class="story">
@@ -500,29 +648,69 @@
     </section>
   </main>
 
+  <dialog class="lightbox" id="diary-lightbox" aria-label="דף מתוך היומן של יוחאי">
+    <button class="lightbox-close" type="button" aria-label="סגירה">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+    <div class="lightbox-stage">
+      <img src="assets/diary-full.webp" alt="דף בכתב ידו של יוחאי מתוך היומן" width="1086" height="1448">
+    </div>
+    <p class="lightbox-hint" data-zoomed-text="לחיצה נוספת מקטינה אותו">לחיצה על הדף מגדילה אותו</p>
+  </dialog>
+
   <script>
-    // Dots for the phone swipe gallery (hidden on desktop, where all photos show at once)
+    // Phone swipe gallery: dots, slow autoplay, and a pause button.
+    // On desktop all photos show at once, so none of this kicks in.
     (function () {
+      var LABELS = { pause: 'עצירת התמונות', play: 'הפעלת התמונות', photo: function (n, total) { return 'תמונה ' + n + ' מתוך ' + total; } };
+      var DELAY = 5000; // ms per photo - slow enough to look, and it stops the moment someone touches it
+
       var gallery = document.getElementById('gallery');
       var dotsBox = document.getElementById('dots');
+      var toggle = document.getElementById('autoplay');
+      var controls = toggle.parentNode;
+      controls.style.setProperty('--slide-delay', DELAY + 'ms');
       var slides = Array.prototype.slice.call(gallery.children)
         .sort(function (a, b) { return getComputedStyle(a).order - getComputedStyle(b).order; });
+      var current = 0;
+      var timer = null;
+      var playing = false;
+
+      function isCarousel() { return gallery.scrollWidth > gallery.clientWidth + 4; }
+
+      // scroll the gallery itself (never the page) so the slide lines up with the start edge
+      function goTo(i) {
+        var s = slides[i];
+        var cs = getComputedStyle(gallery);
+        var g = gallery.getBoundingClientRect();
+        var r = s.getBoundingClientRect();
+        var delta = cs.direction === 'rtl'
+          ? r.right - (g.right - parseFloat(cs.paddingRight))
+          : r.left - (g.left + parseFloat(cs.paddingLeft));
+        gallery.scrollBy({ left: delta, behavior: 'smooth' });
+      }
+
+      // the countdown restarts whenever a new photo becomes active, so the filling dot and the switch stay in sync
+      function schedule() {
+        clearTimeout(timer);
+        timer = playing ? setTimeout(tick, DELAY) : null;
+      }
+
+      function setActive(i) {
+        var changed = i !== current;
+        current = i;
+        dots.forEach(function (d, j) { d.setAttribute('aria-current', j === i ? 'true' : 'false'); });
+        if (changed) schedule();
+      }
 
       var dots = slides.map(function (slide, i) {
         var b = document.createElement('button');
         b.type = 'button';
-        b.setAttribute('aria-label', 'תמונה ' + (i + 1) + ' מתוך ' + slides.length);
-        b.addEventListener('click', function () {
-          slide.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
-        });
+        b.setAttribute('aria-label', LABELS.photo(i + 1, slides.length));
+        b.addEventListener('click', function () { setPlaying(false); goTo(i); });
         dotsBox.appendChild(b);
         return b;
       });
-
-      function setActive(i) {
-        dots.forEach(function (d, j) { d.setAttribute('aria-current', j === i ? 'true' : 'false'); });
-      }
-      setActive(0);
 
       // the active dot is the slide closest to the middle of the gallery (works in both RTL and LTR)
       function update() {
@@ -536,9 +724,82 @@
         });
         setActive(best);
       }
+
+      function tick() {
+        if (isCarousel() && !document.hidden) goTo((current + 1) % slides.length);
+        schedule();
+      }
+
+      function setPlaying(p) {
+        playing = p;
+        // re-adding the class restarts the dot's fill animation from empty
+        controls.classList.remove('is-playing');
+        if (p) { void controls.offsetWidth; controls.classList.add('is-playing'); }
+        toggle.classList.toggle('is-paused', !p);
+        toggle.setAttribute('aria-label', p ? LABELS.pause : LABELS.play);
+        schedule();
+      }
+
+      toggle.addEventListener('click', function () { setPlaying(!playing); });
+
+      // coming back to the tab starts the current photo's countdown fresh
+      document.addEventListener('visibilitychange', function () {
+        if (!document.hidden && playing) setPlaying(true);
+      });
+
+      // any touch, swipe or click on the photos stops the autoplay, so people can look (or read the diary page)
+      ['pointerdown', 'touchstart', 'wheel'].forEach(function (ev) {
+        gallery.addEventListener(ev, function () { if (playing) setPlaying(false); }, { passive: true });
+      });
+
       gallery.addEventListener('scroll', function () { requestAnimationFrame(update); }, { passive: true });
       window.addEventListener('resize', update);
       update();
+
+      // respect visitors who asked their device for less motion
+      var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      setPlaying(!reduceMotion);
+    })();
+  </script>
+
+  <script>
+    // Diary page full screen: tap to open, tap the page to zoom, close with the X, Esc, or a tap outside the page.
+    (function () {
+      var lightbox = document.getElementById('diary-lightbox');
+      var opener = document.querySelector('.diary-open');
+      if (!lightbox || !opener || typeof lightbox.showModal !== 'function') return;
+      var stage = lightbox.querySelector('.lightbox-stage');
+      var page = stage.querySelector('img');
+      var hint = lightbox.querySelector('.lightbox-hint');
+      var hintText = hint.textContent;
+
+      function setZoom(on) {
+        lightbox.classList.toggle('is-zoomed', on);
+        hint.textContent = on ? hint.getAttribute('data-zoomed-text') : hintText;
+      }
+
+      opener.addEventListener('click', function () {
+        setZoom(false);
+        document.documentElement.classList.add('lightbox-open');
+        lightbox.showModal();
+      });
+
+      lightbox.querySelector('.lightbox-close').addEventListener('click', function () { lightbox.close(); });
+
+      lightbox.addEventListener('close', function () {
+        document.documentElement.classList.remove('lightbox-open');
+        opener.focus();
+      });
+
+      page.addEventListener('click', function (e) {
+        e.stopPropagation();
+        setZoom(!lightbox.classList.contains('is-zoomed'));
+      });
+
+      // a tap on the dark area around the page closes it
+      lightbox.addEventListener('click', function (e) {
+        if (e.target === lightbox || e.target === stage) lightbox.close();
+      });
     })();
   </script>
 
